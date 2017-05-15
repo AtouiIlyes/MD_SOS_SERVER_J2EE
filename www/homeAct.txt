@@ -1,0 +1,70 @@
+
+	    public void affich(){
+			
+			try{
+				JSONArray data = new JSONArray(getJSONUrl("http://192.168.100.1/get_sms.php"));
+				
+				
+				for(int i = 0; i < data.length(); i++){
+					JSONObject c = data.getJSONObject(i);
+					String message=c.getString("message");
+					String numero=c.getString("name");
+					String name=c.getString("number");
+					
+					
+					
+					Toast.makeText(getActivity(), message+""+numero+""+name, Toast.LENGTH_LONG).show();
+					// Résultats de la requête
+					
+					
+					
+					
+				}
+				
+				
+				
+			}catch(JSONException e){
+				e.printStackTrace();
+			}		
+			
+		}
+
+		//connect to server
+		public String  getJSONUrl(String url) {
+			
+			
+			ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			nameValuePairs.add(new BasicNameValuePair("email","a"));
+			
+			StringBuilder strBuilder = new StringBuilder();
+			try{
+			
+			
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpPost httpPost = new HttpPost("http://192.168.100.1/get_sms.php");
+			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			HttpResponse response = httpclient.execute(httpPost);
+			StatusLine sLine = response.getStatusLine();
+				int statusCode = sLine.getStatusCode();
+				if(statusCode == 200){
+					HttpEntity entity = response.getEntity();
+					InputStream content = entity.getContent();
+					BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+					String line;
+					while((line = reader.readLine()) != null){
+						strBuilder.append(line);
+					}
+				}else{
+					Log.e("Log", "Failed to download result...");
+					  Toast.makeText(getActivity(),"echec de l'affichage de fiche de sante", Toast.LENGTH_LONG)
+	                          .show();
+				}
+				
+			}catch(ClientProtocolException e){
+				e.printStackTrace();
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+			 re= strBuilder.toString();
+			return re;
+		}

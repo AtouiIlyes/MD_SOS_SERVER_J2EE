@@ -1,0 +1,183 @@
+package isima.ilyes.mdsos;
+
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import info.androidhive.slidingmenu.R;
+import android.app.AlertDialog;
+import android.app.Fragment;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.Contacts;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class SmsFragment extends Fragment {
+	private static final int CONTACT_PICKER_RESULT = 1001;
+	public SmsFragment(){}
+	EditText et;
+	TextView tv;
+	
+	EditText etMes;
+	View rootView;
+	
+	Button b;
+	
+	@Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+ 
+        rootView = inflater.inflate(R.layout.fragment_sms, container, false);
+         
+        et=(EditText) rootView.findViewById(R.id.et2);
+        tv=(TextView)rootView.findViewById(R.id.tv);
+        b=(Button) rootView.findViewById(R.id.b1);
+        b.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				 			ajouter_sms();
+			}
+		});
+       
+        etMes=(EditText) rootView.findViewById(R.id.et1);
+        et.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				 			pick_contact();
+			}
+		});
+        
+       
+        
+        return rootView;
+    }
+	
+	
+	public void pick_contact(){
+		Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,Contacts.CONTENT_URI);  
+        startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);  	
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) 
+    {  
+	     String phone="";
+	     String name="";
+	     
+	     Cursor contacts=null;
+	     try
+	     {
+	        if (resultCode == getActivity().RESULT_OK) 
+	        {  
+	            switch (requestCode) 
+	            {  
+	            case CONTACT_PICKER_RESULT:  
+	                // gets the uri of selected contact
+	             Uri result = data.getData();
+	             // get the contact id from the Uri (last part is contact id) 
+	             String id = result.getLastPathSegment(); 
+	                 //queries the contacts DB for phone no
+	             contacts=getActivity().getContentResolver().query(Phone.CONTENT_URI, null, Phone.CONTACT_ID + "=?", new String[] { id },  null);
+	                //gets index of phone no
+	             int phoneIdx = contacts.getColumnIndex(Phone.DATA); 
+	             int nameIdx = contacts.getColumnIndex(Phone.DISPLAY_NAME);
+	             if (contacts.moveToFirst()) 
+	             {
+	                   //gets the phone no  
+	                   phone = contacts.getString(phoneIdx);
+	                   name = contacts.getString(nameIdx);
+	                   EditText phoneTxt=(EditText)rootView.findViewById(R.id.et2);
+	                   tv.setText(name);
+	                   //assigns phone no to EditText field phoneno
+	                   phoneTxt.setText(phone);                   
+	                } 
+	             else 
+	             {  
+	              Toast.makeText(getActivity(), "error", 100).show();
+	                }  
+	             break;  
+	            }  
+	      
+	        } 
+	        else 
+	        {  
+	            // gracefully handle failure  
+	            Toast.makeText(getActivity(), "Warning: activity result not ok",50).show();  
+	        }  
+	    }
+	     catch (Exception e) 
+	     {  
+	        Toast.makeText(getActivity(), e.getMessage(), 50).show();  
+	        } 
+	     finally 
+	     {  
+	        if (contacts != null) 
+	        {  
+	            contacts.close();  
+	        }
+	     }
+}
+	
+	
+	public void ajouter_sms(){
+		InputStream is = null;
+		String message=etMes.getText().toString();
+		String number=et.getText().toString();
+		String name=tv.getText().toString();
+			
+			ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			nameValuePairs.add(new BasicNameValuePair("email","a"));
+			nameValuePairs.add(new BasicNameValuePair("message",message));
+			nameValuePairs.add(new BasicNameValuePair("numero",number));
+			nameValuePairs.add(new BasicNameValuePair("name",name));
+			
+
+   		try{
+   			HttpClient httpclient = new DefaultHttpClient();
+   			HttpPost httpPost = new HttpPost("http://192.168.100.1/sms.php");
+   			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+   			HttpResponse response = httpclient.execute(httpPost);
+   			HttpEntity entity = response.getEntity();
+   			is = entity.getContent();
+   			
+   			
+   		 
+   		} catch (ClientProtocolException e) {
+				Log.e("ClientProtocol","log_tag");
+				e.printStackTrace();
+			}
+   		catch(Exception e){
+   			Log.e("log_tag", "Error in http connection " + e.toString());
+   		}
+			
+		}
+	
+	
+	
+}

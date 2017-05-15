@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+     android:background="#EFF7F8">    
+     
+    <RelativeLayout
+  	    android:id="@+id/rl2"
+  	    android:layout_width="fill_parent"
+  	    android:layout_height="700dp"
+  	    android:layout_marginLeft="25dp"
+  	    android:layout_marginRight="25dp"
+  	    android:layout_marginTop="30dp"
+  	    android:background="@drawable/bg_relativelayout" >
+    	
+  	    <EditText 
+  	        android:id="@+id/et1"
+  	        android:layout_width="match_parent"
+    		android:layout_height="230dp"
+    		android:layout_marginTop="18dp"
+    		android:layout_marginLeft="12dp"
+    		android:layout_marginRight="12dp"
+    		android:background="@drawable/bg_edittext"
+    		android:hint="Votre Message de secours"
+    		android:textColor="#000"
+    		android:gravity="center_vertical"
+            android:textSize="20sp"
+            android:paddingLeft="25dp"
+            android:textStyle="bold"
+            android:inputType="text"
+    		/>
+  	    
+  	     <TextView
+  	        android:id="@+id/tv"
+  	        android:layout_width="300dp"
+    		android:layout_height="60dp"
+    		android:layout_below="@+id/et1"
+    		android:layout_marginTop="30dp"
+    		android:layout_marginLeft="12dp"
+    		android:layout_marginRight="12dp"
+    		android:background="@drawable/bg_edittext"
+    		android:textColor="#000"
+    		android:gravity="center_vertical"
+            android:textSize="15sp"
+            android:paddingLeft="25dp"
+            android:textStyle="normal"
+            />
+  	    
+  	   <EditText
+  	        android:id="@+id/et2"
+  	        android:layout_width="match_parent"
+    		android:layout_height="60dp"
+    		android:layout_below="@+id/tv"
+    		android:layout_marginTop="5dp"
+    		android:layout_marginLeft="12dp"
+    		android:layout_marginRight="12dp"
+    		android:background="@drawable/bg_edittext"
+    		android:hint="cliquer ici pour choisir votre contact" 
+    		android:textColor="#000"
+    		android:gravity="center_vertical"
+            android:textSize="15sp"
+            android:paddingLeft="25dp"
+            android:textStyle="normal"
+            android:clickable="true"
+            
+    		/>
+  	   
+  	  
+  	   <Button 
+  	        android:id="@+id/b1"
+  	        android:layout_width="230dp"
+  	        android:layout_height="50dp"
+    		android:layout_below="@+id/et2"
+    		android:layout_marginTop="28dp"
+    		android:background="@drawable/bg_relativelinear3"
+    		android:text="Enregistrer"
+    		android:textSize="30dp"
+    		style="@style/AudioFileInfoOverlayText"
+    		android:gravity="center"
+    		android:layout_marginLeft="180dp"/>
+  	    
+  	</RelativeLayout>
+
+</RelativeLayout>

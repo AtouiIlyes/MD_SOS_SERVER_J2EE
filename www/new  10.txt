@@ -1,0 +1,146 @@
+package com.example.qsdd;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+public class Vote extends Activity {
+    /** Called when the activity is first created. */
+	
+	String cin;
+	String emp;
+	String code;
+	String re;
+	
+	TextView txt;
+	TextView Nom;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+       setContentView(R.layout.vote);
+       txt=(TextView) findViewById(R.id.txt);
+       Nom=(TextView) findViewById(R.id.txtNom);
+       
+       if(android.os.Build.VERSION.SDK_INT > 9){
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+			
+		}
+		
+       Intent intent= getIntent();
+        cin =intent.getStringExtra("cin");
+        emp =intent.getStringExtra("emp");
+        code =intent.getStringExtra("code");
+		
+				affich();
+				
+			
+	}
+	
+	public void affich(){
+		final ListView listView1 = (ListView)findViewById(R.id.listView1);
+		String url = "http://192.168.1.24/get_elu.php";
+		try{
+			JSONArray data = new JSONArray(getJSONUrl(url));
+			
+			
+			for(int i = 0; i < data.length(); i++){
+				JSONObject c = data.getJSONObject(i);
+				String nom=c.getString("nom");
+				String prenom=c.getString("prenom");
+				String sexe=c.getString("sexe");
+				String cin=c.getString("cin");
+				String emp=c.getString("emp");
+				String code=c.getString("code");
+				String age=c.getString("age");
+				// Résultats de la requête
+				re = "prenom :" + prenom +"\n" + "sexe: " + sexe
+			+"\n" + "cin: " + cin+"\n" + "emp: " + emp+"\n" + "code: " + code+"\n" + "age: " + age;
+
+				txt.setText(re);
+				Nom.setText(nom);
+
+			}
+			
+			
+			
+		}catch(JSONException e){
+			e.printStackTrace();
+		}		
+		
+	}
+
+	//connect to server
+	public String  getJSONUrl(String url) {
+		
+		
+		ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+		nameValuePairs.add(new BasicNameValuePair("cin",cin));
+		nameValuePairs.add(new BasicNameValuePair("emp",emp));
+		nameValuePairs.add(new BasicNameValuePair("code",code));
+		StringBuilder strBuilder = new StringBuilder();
+		try{
+		
+		
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpPost httpPost = new HttpPost("http://192.168.1.24/get_elu.php");
+		httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+		HttpResponse response = httpclient.execute(httpPost);
+		StatusLine sLine = response.getStatusLine();
+			int statusCode = sLine.getStatusCode();
+			if(statusCode == 200){
+				HttpEntity entity = response.getEntity();
+				InputStream content = entity.getContent();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+				String line;
+				while((line = reader.readLine()) != null){
+					strBuilder.append(line);
+				}
+			}else{
+				Log.e("Log", "Failed to download result...");
+			}
+			
+		}catch(ClientProtocolException e){
+			e.printStackTrace();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		 re= strBuilder.toString();
+		return re;
+	}
+	
+		
+	   
+}
